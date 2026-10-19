@@ -119,8 +119,15 @@ ReadTransform(const std::string & filename,
     }
 
     /** below is a bad thing but it's the only temporary fix i could find for ANTsR on unix --- B.A. */
-    if (transform.IsNull() && (useStaticCastForR == true))
+    if (transform.IsNull() && useStaticCastForR)
     {
+      const auto * candidate = listOfTransforms->front().GetPointer();
+      if (candidate->GetInputSpaceDimension() != VImageDimension ||
+          candidate->GetOutputSpaceDimension() != VImageDimension)
+      {
+        std::cerr << "Transform dimension mismatch in " << filename << std::endl;
+        return transform;
+      }
       transform = static_cast<TransformType *>(listOfTransforms->front().GetPointer());
     }
   }
